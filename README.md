@@ -1,24 +1,113 @@
-python3 atc_server.py
+# Secure ATC Communication System
 
-python3 airplane.py --id AIRPLANE_001
+A secure Air Traffic Control (ATC) communication simulator built using Python, TCP sockets, and multithreading. The system enables real-time communication between multiple aircraft clients and a centralized ATC server while implementing security mechanisms to protect against common network attacks.
 
+## Features
 
-attacker:
-python3 attacker.py --mode spoof --target AIRPLANE_001
+* Real-time communication between multiple aircraft and ATC server
+* Multi-client support using TCP sockets and multithreading
+* HMAC-SHA256 based message authentication
+* Timestamp validation and nonce-based replay attack prevention
+* Rate limiting and temporary blacklisting
+* Request validation and attack monitoring
+* Priority-based landing, takeoff, and gate allocation workflows
+* Concurrent request handling using synchronized queues and semaphores
+* Security testing through spoofing and flooding attack simulations
 
-python3 attacker.py --mode dos --attacker-id EVIL_BOT_99 --count 800 --delay 0.003
+## Technologies Used
 
-python3 attacker.py --mode insider --target AIRPLANE_001 --secret secret-plane-001-xyz
+* Python
+* TCP Sockets
+* Multithreading
+* HMAC-SHA256
+* Queues & Semaphores
+* Network Security Concepts
 
+## Project Structure
 
-database:
+```text
+.
+├── server.py
+├── aircraft.py
+├── secrets/
+│   ├── shared_key.txt
+│   └── nonces.json
+├── utils/
+├── logs/
+└── README.md
+```
 
-sqlite3 atc_logs.db "SELECT id,timestamp,source_id,event_type,details,status FROM logs ORDER BY id DESC LIMIT 50;"
+## Security Mechanisms
 
-sqlite3 atc_logs.db "SELECT id,timestamp,source_id,event_type,details,status FROM logs WHERE event_type='ATTACK_SIMULATION' OR status IN ('REJECTED','TEMP_BANNED','IGNORED') ORDER BY id DESC LIMIT 50;"
+### Authentication
 
-python3 show_attack_results.py
+Messages are authenticated using HMAC-SHA256 to ensure integrity and prevent tampering.
 
+### Replay Protection
 
-DB check for emergency events:
-sqlite3 atc_logs.db "SELECT id,timestamp,source_id,event_type,details,status FROM logs WHERE event_type='ENQUEUED' OR event_type='ALLOTMENT' ORDER BY id DESC LIMIT 100;"
+Timestamp validation and nonce tracking prevent attackers from reusing previously transmitted messages.
+
+### DoS Mitigation
+
+The server implements:
+
+* Rate limiting
+* Request validation
+* Temporary blacklisting
+* Attack monitoring
+
+### Spoofing Prevention
+
+Only authenticated aircraft with valid credentials can communicate with the ATC server.
+
+## Workflow
+
+1. Aircraft connects to the ATC server.
+2. Request is authenticated and validated.
+3. Server verifies timestamp and nonce.
+4. Request is processed based on priority.
+5. Landing, takeoff, or gate allocation decision is returned.
+6. Security events are logged for monitoring.
+
+## Running the Project
+
+### Prerequisites
+
+* Python 3.9+
+* Required dependencies installed
+
+### Start the Server
+
+```bash
+python server.py
+```
+
+### Start an Aircraft Client
+
+```bash
+python aircraft.py
+```
+
+Run multiple client instances to simulate multiple aircraft communicating with the server.
+
+## Learning Outcomes
+
+This project demonstrates:
+
+* Network programming using TCP sockets
+* Concurrent systems using multithreading
+* Secure communication design
+* Authentication and replay protection techniques
+* Basic denial-of-service mitigation strategies
+* Resource allocation and synchronization concepts
+
+## Future Improvements
+
+* TLS-based encrypted communication
+* Graphical monitoring dashboard
+* Persistent database integration
+* Advanced scheduling algorithms
+* Distributed ATC server architecture
+
+```
+```
